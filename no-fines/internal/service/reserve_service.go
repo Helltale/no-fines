@@ -12,7 +12,7 @@ import (
 
 type ReserveService struct {
 	reserveRepo domain.ReserveRepository
-	mu          sync.Mutex // Для предотвращения race condition
+	mu          sync.Mutex
 }
 
 func NewReserveService(reserveRepo domain.ReserveRepository) *ReserveService {
@@ -21,7 +21,7 @@ func NewReserveService(reserveRepo domain.ReserveRepository) *ReserveService {
 	}
 }
 
-// CheckAndReserve проверяет наличие достаточных резервов и блокирует их.
+// проверяет наличие достаточных резервов и блокирует их.
 func (s *ReserveService) CheckAndReserve(ctx context.Context, currency string, amount float64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -38,7 +38,7 @@ func (s *ReserveService) CheckAndReserve(ctx context.Context, currency string, a
 			if reserve.Amount < amount {
 				return errors.New("insufficient reserves")
 			}
-			reserves[i].Amount -= amount // Блокируем средства
+			reserves[i].Amount -= amount // блокируем средства
 			found = true
 			break
 		}
@@ -51,7 +51,7 @@ func (s *ReserveService) CheckAndReserve(ctx context.Context, currency string, a
 	return s.reserveRepo.UpdateReserves(ctx, reserves)
 }
 
-// ReleaseReserves возвращает заблокированные средства обратно в резервы.
+// возвращает заблокированные средства обратно в резервы.
 func (s *ReserveService) ReleaseReserves(ctx context.Context, currency string, amount float64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -63,7 +63,7 @@ func (s *ReserveService) ReleaseReserves(ctx context.Context, currency string, a
 
 	for i, reserve := range reserves {
 		if reserve.Currency == currency {
-			reserves[i].Amount += amount // Возвращаем средства
+			reserves[i].Amount += amount // возвращаем средства
 			return s.reserveRepo.UpdateReserves(ctx, reserves)
 		}
 	}
@@ -71,7 +71,7 @@ func (s *ReserveService) ReleaseReserves(ctx context.Context, currency string, a
 	return errors.New("currency not found in reserves")
 }
 
-// UpdateReserves обновляет резервы после завершения транзакции.
+// обновляет резервы после завершения транзакции.
 func (s *ReserveService) UpdateReserves(ctx context.Context, updates []domain.Reserve) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

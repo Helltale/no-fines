@@ -14,7 +14,7 @@ type ExchangeProvider interface {
 	GetRates(pair CurrencyPair) ([]ExchangeRate, error)
 }
 
-// Мок-провайдер
+// mock
 type MockProvider struct{}
 
 func (p *MockProvider) GetRates(pair CurrencyPair) ([]ExchangeRate, error) {

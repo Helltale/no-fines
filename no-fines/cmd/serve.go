@@ -44,7 +44,7 @@ var serveCmd = &cobra.Command{
 			log.Fatalf("failed to reserve funds: %v", err)
 		}
 
-		// Запускаем gRPC-сервер
+		// gRPC
 		go func() {
 			lis, err := net.Listen("tcp", ":"+cfg.APP_GRPC_PORT)
 			if err != nil {
@@ -58,7 +58,7 @@ var serveCmd = &cobra.Command{
 			}
 		}()
 
-		// Запускаем HTTP-сервер
+		// HTTP
 		http.Handle("/exchange/rate", transport.NewExchangeHandler(exchangeService))
 		log.Printf("HTTP server listening at :%s", cfg.APP_HTTP_PORT)
 		if err := http.ListenAndServe(":"+cfg.APP_HTTP_PORT, nil); err != nil {
