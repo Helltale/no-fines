@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package nofines;
+
+option go_package = "github.com/Helltale/no-fines/proto";
+
+service ExchangeService {
+  rpc GetExchangeRate(GetExchangeRateRequest) returns (GetExchangeRateResponse);
+}
+
+message GetExchangeRateRequest {
+  string base_currency = 1;
+  string quote_currency = 2;
+}
+
+message GetExchangeRateResponse {
+  float rate = 1;
+}
